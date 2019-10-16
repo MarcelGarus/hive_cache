@@ -73,7 +73,7 @@ class HiveCache {
     return await _data.get(key);
   }
 
-  Future<void> setChildren(String key, List<String> children) async {
+  Future<void> putChildren(String key, List<String> children) async {
     await _ensureInitialized();
     await _children.put(key, children);
   }
@@ -83,8 +83,8 @@ class HiveCache {
     return (_children.get(key) as List).cast<String>();
   }
 
-  Future<void> setRootChildren(List<String> children) async {
-    await setChildren(_cacheRootKey, children);
+  Future<void> putRootChildren(List<String> children) async {
+    await putChildren(_cacheRootKey, children);
   }
 
   Future<List<String>> getRootChildren() async {
