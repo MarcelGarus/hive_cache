@@ -5,7 +5,7 @@ import 'dart:collection';
 import 'package:hive/hive.dart';
 
 class HiveCache {
-  static const _cacheRootId = '_cache_root_';
+  static const _cacheRootKey = '_cache_root_';
 
   final String name;
   final int maxEntries;
@@ -45,8 +45,8 @@ class HiveCache {
 
     // Go through the children relation and check all ids that are useful
     // (that is the '_cache_root_' and all its recursive children).
-    final usefulIds = <String>{_cacheRootId};
-    final queue = Queue<String>()..add(_cacheRootId);
+    final usefulIds = <String>{_cacheRootKey};
+    final queue = Queue<String>()..add(_cacheRootKey);
 
     while (queue.isNotEmpty) {
       final id = queue.removeFirst();
@@ -63,12 +63,12 @@ class HiveCache {
     _data.deleteAll(nonUsefulIds);
   }
 
-  Future<void> setEntry(String key, dynamic value) async {
+  Future<void> put(String key, dynamic value) async {
     await _ensureInitialized();
     await _data.put(key, value);
   }
 
-  Future<dynamic> getEntry(String key) async {
+  Future<dynamic> get(String key) async {
     await _ensureInitialized();
     return await _data.get(key);
   }
@@ -81,5 +81,13 @@ class HiveCache {
   Future<List<String>> getChildren(String key) async {
     await _ensureInitialized();
     return (_children.get(key) as List).cast<String>();
+  }
+
+  Future<void> setRootChildren(List<String> children) async {
+    await setChildren(_cacheRootKey, children);
+  }
+
+  Future<List<String>> getRootChildren() async {
+    return await getChildren(_cacheRootKey);
   }
 }
