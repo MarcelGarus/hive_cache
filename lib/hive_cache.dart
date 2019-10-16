@@ -8,40 +8,27 @@ class HiveCache {
   static const _cacheRootKey = '_cache_root_';
 
   final String name;
-  final int maxEntries;
-  final bool isLazy;
 
   Box _children;
   LazyBox _data;
-  Future<void> _initializer;
   bool get isInitialized => _children != null && _data != null;
 
-  HiveCache({
-    this.name = 'cache',
-    this.maxEntries,
-    this.isLazy,
-  }) : assert(name != null) {
-    _initializer = () async {
-      // Open the boxes.
-      await Future.wait([
-        () async {
-          _children = await Hive.openBox('_children_$name');
-        }(),
-        () async {
-          _data = await Hive.openBox(name);
-        }(),
-      ]);
-      await _collectGarbage();
-    }();
-  }
+  HiveCache({this.name = 'cache'}) : assert(name != null);
 
-  Future<void> _ensureInitialized() async {
-    if (!isInitialized) await _initializer;
-    assert(isInitialized);
+  Future<void> initialize() async {
+    await Future.wait([
+      () async {
+        _children = await Hive.openBox('_children_$name');
+      }(),
+      () async {
+        _data = await Hive.openBox(name);
+      }(),
+    ]);
+    await _collectGarbage();
   }
 
   Future<void> _collectGarbage() async {
-    await _ensureInitialized();
+    assert(isInitialized);
 
     // Go through the children relation and check all ids that are useful
     // (that is the '_cache_root_' and all its recursive children).
@@ -64,22 +51,22 @@ class HiveCache {
   }
 
   Future<void> put(String key, dynamic value) async {
-    await _ensureInitialized();
+    assert(isInitialized);
     await _data.put(key, value);
   }
 
   Future<dynamic> get(String key) async {
-    await _ensureInitialized();
+    assert(isInitialized);
     return await _data.get(key);
   }
 
   Future<void> putChildren(String key, List<String> children) async {
-    await _ensureInitialized();
+    assert(isInitialized);
     await _children.put(key, children);
   }
 
   Future<List<String>> getChildren(String key) async {
-    await _ensureInitialized();
+    assert(isInitialized);
     return (_children.get(key) as List).cast<String>();
   }
 
