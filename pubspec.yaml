@@ -1,6 +1,6 @@
 name: hive_cache
 description: A persistent cache that uses hive.
-version: 0.0.2
+version: 0.1.0
 author: Marcel Garus <marcel.garus@gmail.com>
 homepage: https://github.com/marcelgarus/hive_cache
 

@@ -5,20 +5,22 @@ import 'dart:collection';
 import 'package:hive/hive.dart';
 
 class HiveCache {
-  static const _cacheRootKey = '_cache_root_';
-
   final String name;
 
-  Box _children;
+  Box _rootKeys;
+  Box _parents;
   LazyBox _data;
-  bool get isInitialized => _children != null && _data != null;
+  bool get isInitialized => _parents != null && _data != null;
 
   HiveCache({this.name = 'cache'}) : assert(name != null);
 
   Future<void> initialize() async {
     await Future.wait([
       () async {
-        _children = await Hive.openBox('_children_$name');
+        _rootKeys = await Hive.openBox('_root_ids_${name}_');
+      }(),
+      () async {
+        _parents = await Hive.openBox('_parents_${name}_');
       }(),
       () async {
         _data = await Hive.openBox(name);
@@ -30,29 +32,33 @@ class HiveCache {
   Future<void> _collectGarbage() async {
     assert(isInitialized);
 
-    // Go through the children relation and check all ids that are useful
-    // (that is the '_cache_root_' and all its recursive children).
-    final usefulIds = <String>{_cacheRootKey};
-    final queue = Queue<String>()..add(_cacheRootKey);
+    final children = <String, List<String>>{};
+    for (var child in _data.keys) {
+      var parent = _parents.get(child);
+      children.putIfAbsent(parent, () => []).add(child);
+    }
+
+    final usefulIds = <String>{};
+    final queue = Queue<String>()..addAll(_rootKeys.values);
 
     while (queue.isNotEmpty) {
       final id = queue.removeFirst();
       if (usefulIds.contains(id)) continue;
 
       usefulIds.add(id);
-      final children = _children.get(id) ?? [];
-      queue.addAll(children);
+      queue.addAll(children[id] ?? []);
     }
 
     // Remove all the non-useful children relations and data entries.
-    final nonUsefulIds = _children.keys.toSet().difference(usefulIds);
-    _children.deleteAll(nonUsefulIds);
+    final nonUsefulIds = _data.keys.toSet().difference(usefulIds);
+    _parents.deleteAll(nonUsefulIds);
     _data.deleteAll(nonUsefulIds);
   }
 
-  Future<void> put(String key, dynamic value) async {
+  Future<void> put(String key, String parent, dynamic value) async {
     assert(isInitialized);
     await _data.put(key, value);
+    await _parents.put(key, parent);
   }
 
   Future<dynamic> get(String key) async {
@@ -60,21 +66,14 @@ class HiveCache {
     return await _data.get(key);
   }
 
-  Future<void> putChildren(String key, List<String> children) async {
-    assert(isInitialized);
-    await _children.put(key, children);
+  Future<void> setRootKeys(List<String> keys) async {
+    _rootKeys.clear();
+    await Future.wait([
+      for (var key in keys) _rootKeys.add(key),
+    ]);
   }
 
-  Future<List<String>> getChildren(String key) async {
-    assert(isInitialized);
-    return (_children.get(key) as List).cast<String>();
-  }
-
-  Future<void> putRootChildren(List<String> children) async {
-    await putChildren(_cacheRootKey, children);
-  }
-
-  Future<List<String>> getRootChildren() async {
-    return await getChildren(_cacheRootKey);
+  Future<List<String>> getRootKeys() async {
+    return await _rootKeys.values;
   }
 }
