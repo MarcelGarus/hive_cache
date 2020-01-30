@@ -1,3 +1,19 @@
+## [1.0.0] - 2020-01-30
+
+* Complete overhaul of the concept and the API.
+
+## [0.1.3] - 2019-10-26
+
+* Fix minor issues.
+
+## [0.1.2] - 2019-10-26
+
+* Fix minor issues.
+
+## [0.1.1] - 2019-10-26
+
+* Add `getChildrenOfType` method.
+
 ## [0.1.0] - 2019-10-17
 
 * `HiveCache` now works the other way around - items depend on their parents.
