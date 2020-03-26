@@ -11,10 +11,9 @@ dependencies:
     sdk: flutter
 
   flutter_cached:
-    path: ../flutter_cached
-    # git:
-    #   url: git://github.com/marcelgarus/flutter_cached
-    #   ref: f968528
+    git:
+      url: git://github.com/marcelgarus/flutter_cached
+      ref: 176887a
 
   hive: ^1.2.0
   hive_flutter: ^0.3.0+2
