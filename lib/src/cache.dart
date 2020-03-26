@@ -103,7 +103,9 @@ class _Fetcher<E extends Entity<E>> {
   Id<E> _createId(String id) => Id<E>(id);
 
   _IdCollectionData<E> _createCollection(String id, List<String> childrenIds) {
-    final ids = childrenIds.map((child) => Id<E>(child)).toList();
-    return _IdCollectionData<E>(id: id, childrenIds: ids);
+    return _IdCollectionData<E>(
+      id: Id<_IdCollectionData<E>>(id),
+      childrenIds: childrenIds.map((child) => Id<E>(child)).toList(),
+    );
   }
 }

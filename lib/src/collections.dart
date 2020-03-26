@@ -5,7 +5,7 @@ class IdCollection<E extends Entity<E>> {
       : assert(id != null),
         assert(fetcher != null);
 
-  final Id<_IdCollectionData<E>> id;
+  final String id;
   final FutureOr<List<E>> Function() fetcher;
 }
 
@@ -13,11 +13,10 @@ class IdCollection<E extends Entity<E>> {
 class _IdCollectionData<E extends Entity<E>>
     implements Entity<_IdCollectionData<E>> {
   _IdCollectionData({
-    @required String id,
+    @required this.id,
     this.childrenIds = const [],
   })  : assert(id != null),
-        assert(childrenIds != null),
-        this.id = Id<_IdCollectionData<E>>(id);
+        assert(childrenIds != null);
 
   @override
   final Id<_IdCollectionData<E>> id;

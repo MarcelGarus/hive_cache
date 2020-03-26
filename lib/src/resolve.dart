@@ -10,6 +10,8 @@ extension ResolvedId<E extends Entity<E>> on Id<E> {
 }
 
 extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
+  Id<_IdCollectionData> get _id => Id<_IdCollectionData>(id);
+
   StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<List<Id<E>>>(() async {
       final entities = await this.fetcher();
@@ -17,8 +19,8 @@ extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
       return entities.map((entity) => entity.id).toList();
     }).cached(
       save: (ids) =>
-          HiveCache.put(_IdCollectionData<E>(id: this.id, childrenIds: ids)),
-      load: () => HiveCache.get(this.id),
+          HiveCache.put(_IdCollectionData<E>(id: _id, childrenIds: ids)),
+      load: () => HiveCache.get(_id),
     );
   }
 
@@ -27,10 +29,10 @@ extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
       save: (entities) {
         entities.forEach(HiveCache.put);
         final ids = entities.map((entity) => entity.id).toList();
-        _IdCollectionData(id: id, childrenIds: ids).saveToCache();
+        _IdCollectionData<E>(id: _id, childrenIds: ids).saveToCache();
       },
       load: () {
-        final streamOfIds = HiveCache.getStreamed<_IdCollectionData<E>>(id)
+        final streamOfIds = HiveCache.getStreamed<_IdCollectionData<E>>(_id)
             .map((collection) => collection.childrenIds);
 
         return streamOfIds.switchMap((ids) {
