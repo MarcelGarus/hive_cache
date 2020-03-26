@@ -1,7 +1,7 @@
 part of 'cache.dart';
 
-const typeIdForId = 123;
-const typeIdForIdCollection = 124;
+const typeIdForId = 200;
+const typeIdForIdCollection = 201;
 
 class _AdapterForId extends TypeAdapter<Id<dynamic>> {
   @override

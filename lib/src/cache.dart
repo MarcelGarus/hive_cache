@@ -40,6 +40,9 @@ class HiveCacheImpl {
   Future<void> initialize([String boxName]) async {
     assert(_box == null, 'initialize was already called');
     await Hive.initFlutter();
+    Hive
+      ..registerAdapter(_AdapterForId())
+      ..registerAdapter(_AdapterForIdCollectionData());
     _box = await Hive.openBox(boxName ?? 'cache');
   }
 
@@ -49,6 +52,10 @@ class HiveCacheImpl {
     assert(_fetchers[typeId] == null,
         'A fetcher with typeId $typeId is already registered');
     _fetchers[typeId] = _Fetcher<E>(fetch);
+    registerAdapter(adapter);
+  }
+
+  void registerAdapter<T>(TypeAdapter<T> adapter) {
     Hive.registerAdapter(adapter);
   }
 
