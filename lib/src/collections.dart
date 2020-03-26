@@ -12,11 +12,12 @@ class IdCollection<E extends Entity<E>> {
 /// A wrapper around multiple [Id]s.
 class _IdCollectionData<E extends Entity<E>>
     implements Entity<_IdCollectionData<E>> {
-  const _IdCollectionData({
-    @required this.id,
+  _IdCollectionData({
+    @required String id,
     this.childrenIds = const [],
   })  : assert(id != null),
-        assert(childrenIds != null);
+        assert(childrenIds != null),
+        this.id = Id<_IdCollectionData<E>>(id);
 
   @override
   final Id<_IdCollectionData<E>> id;
