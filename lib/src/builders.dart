@@ -2,13 +2,13 @@ part of 'cache.dart';
 
 typedef FetchCallback = Future<void> Function({bool force});
 
-typedef RawBuilder<E extends Entity<E>> = Widget Function(
+typedef RawBuilder<T> = Widget Function(
   BuildContext,
-  StreamAndData<E, CachedFetchStreamData<dynamic>>,
+  StreamAndData<T, CachedFetchStreamData<dynamic>>,
 );
-typedef FetchableBuilder<E extends Entity<E>> = Widget Function(
+typedef FetchableBuilder<T> = Widget Function(
   BuildContext,
-  AsyncSnapshot<E>,
+  AsyncSnapshot<T>,
   FetchCallback fetch,
 );
 
