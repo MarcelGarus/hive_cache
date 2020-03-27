@@ -18,20 +18,18 @@ class _AdapterForId extends TypeAdapter<Id<dynamic>> {
 }
 
 class _AdapterForIdCollectionData
-    extends TypeAdapter<_IdCollectionData<dynamic>> {
+    extends TypeAdapter<_CollectionData<dynamic>> {
   @override
   int get typeId => typeIdForIdCollection;
 
   @override
-  void write(BinaryWriter writer, _IdCollectionData<dynamic> collection) =>
-      writer
-        ..writeInt(collection.typeId)
-        ..writeString(collection.id.value)
-        ..writeStringList(
-            collection.childrenIds.map((id) => id.value).toList());
+  void write(BinaryWriter writer, _CollectionData<dynamic> collection) => writer
+    ..writeInt(collection.typeId)
+    ..writeString(collection.id.value)
+    ..writeStringList(collection.childrenIds.map((id) => id.value).toList());
 
   @override
-  _IdCollectionData<dynamic> read(BinaryReader reader) =>
+  _CollectionData<dynamic> read(BinaryReader reader) =>
       HiveCache._createCollectionOfTypeId(
         reader.readInt(),
         reader.readString(),

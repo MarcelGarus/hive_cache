@@ -80,7 +80,7 @@ class HiveCacheImpl {
       _fetchers[id] ?? (throw UnsupportedError('Unknown type id $id.'));
   Id<dynamic> _createIdOfTypeId(int typeId, String id) =>
       _getFetcherOfTypeId(typeId)._createId(id);
-  _IdCollectionData<dynamic> _createCollectionOfTypeId(
+  _CollectionData<dynamic> _createCollectionOfTypeId(
           int typeId, String id, List<String> children) =>
       _getFetcherOfTypeId(typeId)._createCollection(id, children);
 
@@ -103,9 +103,9 @@ class _Fetcher<E extends Entity<E>> {
 
   Id<E> _createId(String id) => Id<E>(id);
 
-  _IdCollectionData<E> _createCollection(String id, List<String> childrenIds) {
-    return _IdCollectionData<E>(
-      id: Id<_IdCollectionData<E>>(id),
+  _CollectionData<E> _createCollection(String id, List<String> childrenIds) {
+    return _CollectionData<E>(
+      id: Id<_CollectionData<E>>(id),
       childrenIds: childrenIds.map((child) => Id<E>(child)).toList(),
     );
   }

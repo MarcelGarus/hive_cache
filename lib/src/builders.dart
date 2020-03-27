@@ -96,13 +96,13 @@ class CollectionBuilder<E extends Entity<E>> extends StatefulWidget {
 
   static _PopulatedCollectionBuilder<E> populated<E extends Entity<E>>({
     Key key,
-    @required IdCollection<E> collection,
+    @required Collection<E> collection,
     @required FetchablePopulatedCollectionBuilder<E> builder,
   }) =>
       _PopulatedCollectionBuilder(
           key: key, collection: collection, builder: builder);
 
-  final IdCollection<E> collection;
+  final Collection<E> collection;
   final FetchableCollectionBuilder<E> builder;
 
   @override
@@ -154,7 +154,7 @@ class _PopulatedCollectionBuilder<E extends Entity<E>> extends StatefulWidget {
         assert(builder != null),
         super(key: key);
 
-  final IdCollection<E> collection;
+  final Collection<E> collection;
   final FetchablePopulatedCollectionBuilder<E> builder;
 
   @override

@@ -9,8 +9,8 @@ extension ResolvedId<E extends Entity<E>> on Id<E> {
   }
 }
 
-extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
-  Id<_IdCollectionData<E>> get _id => Id<_IdCollectionData<E>>(id);
+extension ResolvedIdCollection<E extends Entity<E>> on Collection<E> {
+  Id<_CollectionData<E>> get _id => Id<_CollectionData<E>>(id);
 
   StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<List<Id<E>>>(() async {
@@ -19,7 +19,7 @@ extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
       return entities.map((entity) => entity.id).toList();
     }).cached(
       save: (ids) =>
-          _IdCollectionData<E>(id: _id, childrenIds: ids).saveToCache(),
+          _CollectionData<E>(id: _id, childrenIds: ids).saveToCache(),
       load: () => HiveCache.get(_id),
     );
   }
