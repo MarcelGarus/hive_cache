@@ -8,7 +8,7 @@ typedef RawBuilder<T> = Widget Function(
 );
 typedef FetchableBuilder<T> = Widget Function(
   BuildContext,
-  AsyncSnapshot<T>,
+  T,
   FetchCallback fetch,
 );
 
@@ -61,7 +61,7 @@ class EntityBuilder<E extends Entity<E>> extends StatelessWidget {
       _RawEntityBuilder<E>(id: id, builder: builder);
 
   final Id<E> id;
-  final FetchableBuilder<E> builder;
+  final FetchableBuilder<AsyncSnapshot<E>> builder;
 
   @override
   Widget build(BuildContext context) {

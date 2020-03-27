@@ -13,6 +13,7 @@ part 'collection.dart';
 part 'id_and_entity.dart';
 part 'resolve.dart';
 part 'utils.dart';
+part 'connection.dart';
 
 typedef FetchById<E extends Entity<E>> = Future<E> Function(Id<E> id);
 
@@ -43,7 +44,8 @@ class HiveCacheImpl {
     await Hive.initFlutter();
     Hive
       ..registerAdapter(_AdapterForId())
-      ..registerAdapter(_AdapterForIdCollectionData());
+      ..registerAdapter(_AdapterForIdCollectionData())
+      ..registerAdapter(_AdapterForIdConnectionData());
     _box = await Hive.openBox(boxName ?? 'cache');
   }
 
@@ -83,6 +85,9 @@ class HiveCacheImpl {
   _CollectionData<dynamic> _createCollectionOfTypeId(
           int typeId, String id, List<String> children) =>
       _getFetcherOfTypeId(typeId)._createCollection(id, children);
+  _ConnectionData<dynamic> _createConnectionOfTypeId(
+          int typeId, String id, String connectedId) =>
+      _getFetcherOfTypeId(typeId)._createConnection(id, connectedId);
 
   void put<E extends Entity<E>>(E entity) {
     _box.put(entity.id.value, entity);
@@ -107,6 +112,13 @@ class _Fetcher<E extends Entity<E>> {
     return _CollectionData<E>(
       id: Id<_CollectionData<E>>(id),
       childrenIds: childrenIds.map((child) => Id<E>(child)).toList(),
+    );
+  }
+
+  _ConnectionData<E> _createConnection(String id, String connectedId) {
+    return _ConnectionData(
+      id: Id<_ConnectionData<E>>(id),
+      connectedId: Id<E>(connectedId),
     );
   }
 }

@@ -2,6 +2,7 @@ part of 'cache.dart';
 
 const typeIdForId = 200;
 const typeIdForIdCollection = 201;
+const typeIdForIdConnection = 202;
 
 class _AdapterForId extends TypeAdapter<Id<dynamic>> {
   @override
@@ -34,5 +35,25 @@ class _AdapterForIdCollectionData
         reader.readInt(),
         reader.readString(),
         reader.readStringList(),
+      );
+}
+
+class _AdapterForIdConnectionData
+    extends TypeAdapter<_ConnectionData<dynamic>> {
+  @override
+  int get typeId => typeIdForIdConnection;
+
+  @override
+  void write(BinaryWriter writer, _ConnectionData<dynamic> connection) => writer
+    ..writeInt(connection.typeId)
+    ..writeString(connection.id.value)
+    ..writeString(connection.connectedId.value);
+
+  @override
+  _ConnectionData<dynamic> read(BinaryReader reader) =>
+      HiveCache._createConnectionOfTypeId(
+        reader.readInt(),
+        reader.readString(),
+        reader.readString(),
       );
 }
