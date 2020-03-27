@@ -8,6 +8,7 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'adapters.dart';
+part 'builders.dart';
 part 'collections.dart';
 part 'id_and_entity.dart';
 part 'resolve.dart';

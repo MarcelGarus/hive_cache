@@ -4,7 +4,7 @@ version: 1.0.0
 homepage: https://github.com/marcelgarus/hive_cache
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.6.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -13,7 +13,7 @@ dependencies:
   flutter_cached:
     git:
       url: git://github.com/marcelgarus/flutter_cached
-      ref: 176887a
+      ref: c6d7e8d
 
   hive: ^1.2.0
   hive_flutter: ^0.3.0+2

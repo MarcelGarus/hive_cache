@@ -10,7 +10,7 @@ extension ResolvedId<E extends Entity<E>> on Id<E> {
 }
 
 extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
-  Id<_IdCollectionData> get _id => Id<_IdCollectionData>(id);
+  Id<_IdCollectionData<E>> get _id => Id<_IdCollectionData<E>>(id);
 
   StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<List<Id<E>>>(() async {
@@ -19,28 +19,23 @@ extension ResolvedIdCollection<E extends Entity<E>> on IdCollection<E> {
       return entities.map((entity) => entity.id).toList();
     }).cached(
       save: (ids) =>
-          HiveCache.put(_IdCollectionData<E>(id: _id, childrenIds: ids)),
+          _IdCollectionData<E>(id: _id, childrenIds: ids).saveToCache(),
       load: () => HiveCache.get(_id),
     );
   }
+}
 
-  StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolvePopulated() {
-    return FetchStream.create<List<E>>(fetcher).cached(
-      save: (entities) {
-        entities.forEach(HiveCache.put);
-        final ids = entities.map((entity) => entity.id).toList();
-        _IdCollectionData<E>(id: _id, childrenIds: ids).saveToCache();
-      },
-      load: () {
-        final streamOfIds = HiveCache.getStreamed<_IdCollectionData<E>>(_id)
-            .map((collection) => collection.childrenIds);
+extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
+  Stream<List<E>> resolveAll() {
+    return CombineLatestStream.list([
+      for (final id in this) HiveCache.getStreamed<E>(id),
+    ]);
+  }
+}
 
-        return streamOfIds.switchMap((ids) {
-          return CombineLatestStream.list([
-            for (final id in ids) HiveCache.getStreamed<E>(id),
-          ]);
-        });
-      },
-    );
+extension ResolvedIdListStream<E extends Entity<E>>
+    on StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> {
+  StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolvedAll() {
+    return switchMap((ids) => ids.resolveAll());
   }
 }
