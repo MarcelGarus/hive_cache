@@ -35,7 +35,7 @@ extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
 
 extension ResolvedIdListStream<E extends Entity<E>>
     on StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> {
-  StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolvedAll() {
+  StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolveAll() {
     return switchMap((ids) => ids.resolveAll());
   }
 }
