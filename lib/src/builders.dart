@@ -189,11 +189,11 @@ class ConnectionBuilder<E extends Entity<E>> extends StatefulWidget {
 
   static _PopulatedConnectionBuilder<E> populated<E extends Entity<E>>({
     Key key,
-    @required Connection<E> collection,
+    @required Connection<E> connection,
     @required FetchableBuilder<AsyncSnapshot<E>> builder,
   }) =>
       _PopulatedConnectionBuilder(
-          key: key, collection: collection, builder: builder);
+          key: key, connection: connection, builder: builder);
 
   final Connection<E> connection;
   final FetchableBuilder<AsyncSnapshot<Id<E>>> builder;
@@ -234,13 +234,13 @@ class _ConnectionBuilderState<E extends Entity<E>>
 class _PopulatedConnectionBuilder<E extends Entity<E>> extends StatefulWidget {
   const _PopulatedConnectionBuilder({
     Key key,
-    @required this.collection,
+    @required this.connection,
     @required this.builder,
-  })  : assert(collection != null),
+  })  : assert(connection != null),
         assert(builder != null),
         super(key: key);
 
-  final Connection<E> collection;
+  final Connection<E> connection;
   final FetchableBuilder<AsyncSnapshot<E>> builder;
 
   @override
@@ -255,7 +255,7 @@ class _PopulatedConnectionBuilderState<E extends Entity<E>>
   @override
   void initState() {
     super.initState();
-    stream = widget.collection.resolve().resolve();
+    stream = widget.connection.resolve().resolve();
   }
 
   @override
