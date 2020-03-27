@@ -39,3 +39,25 @@ extension ResolvedIdListStream<E extends Entity<E>>
     return switchMap((ids) => ids.resolveAll());
   }
 }
+
+extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
+  Id<_ConnectionData<E>> get _id => Id<_ConnectionData<E>>(id);
+
+  StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> resolve() {
+    return FetchStream.create<Id<E>>(() async {
+      final entity = await fetcher()
+        ..saveToCache();
+      return entity.id;
+    }).cached(
+      save: (id) => _ConnectionData<E>(id: _id, connectedId: id).saveToCache(),
+      load: () => HiveCache.get(_id),
+    );
+  }
+}
+
+extension ResolvedIdStream<E extends Entity<E>>
+    on StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> {
+  StreamAndData<E, CachedFetchStreamData<dynamic>> resolve() {
+    return switchMap((id) => id.resolve());
+  }
+}

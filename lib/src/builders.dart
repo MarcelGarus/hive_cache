@@ -79,12 +79,6 @@ class EntityBuilder<E extends Entity<E>> extends StatelessWidget {
   }
 }
 
-typedef FetchableCollectionBuilder<E extends Entity<E>> = Widget Function(
-  BuildContext,
-  AsyncSnapshot<List<Id<E>>>,
-  FetchCallback fetch,
-);
-
 class CollectionBuilder<E extends Entity<E>> extends StatefulWidget {
   const CollectionBuilder({
     Key key,
@@ -97,13 +91,13 @@ class CollectionBuilder<E extends Entity<E>> extends StatefulWidget {
   static _PopulatedCollectionBuilder<E> populated<E extends Entity<E>>({
     Key key,
     @required Collection<E> collection,
-    @required FetchablePopulatedCollectionBuilder<E> builder,
+    @required FetchableBuilder<AsyncSnapshot<List<E>>> builder,
   }) =>
       _PopulatedCollectionBuilder(
           key: key, collection: collection, builder: builder);
 
   final Collection<E> collection;
-  final FetchableCollectionBuilder<E> builder;
+  final FetchableBuilder<AsyncSnapshot<List<Id<E>>>> builder;
 
   @override
   _CollectionBuilderState<E> createState() => _CollectionBuilderState<E>();
@@ -138,13 +132,6 @@ class _CollectionBuilderState<E extends Entity<E>>
   }
 }
 
-typedef FetchablePopulatedCollectionBuilder<E extends Entity<E>> = Widget
-    Function(
-  BuildContext,
-  AsyncSnapshot<List<E>>,
-  FetchCallback fetch,
-);
-
 class _PopulatedCollectionBuilder<E extends Entity<E>> extends StatefulWidget {
   const _PopulatedCollectionBuilder({
     Key key,
@@ -155,7 +142,7 @@ class _PopulatedCollectionBuilder<E extends Entity<E>> extends StatefulWidget {
         super(key: key);
 
   final Collection<E> collection;
-  final FetchablePopulatedCollectionBuilder<E> builder;
+  final FetchableBuilder<AsyncSnapshot<List<E>>> builder;
 
   @override
   _PopulatedCollectionBuilderState<E> createState() =>
@@ -181,6 +168,105 @@ class _PopulatedCollectionBuilderState<E extends Entity<E>>
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<E>>(
+      stream: stream,
+      builder: (context, snapshot) => widget.builder(
+        context,
+        snapshot,
+        stream.fetch,
+      ),
+    );
+  }
+}
+
+class ConnectionBuilder<E extends Entity<E>> extends StatefulWidget {
+  const ConnectionBuilder({
+    Key key,
+    @required this.connection,
+    @required this.builder,
+  })  : assert(connection != null),
+        assert(builder != null),
+        super(key: key);
+
+  static _PopulatedConnectionBuilder<E> populated<E extends Entity<E>>({
+    Key key,
+    @required Connection<E> collection,
+    @required FetchableBuilder<AsyncSnapshot<E>> builder,
+  }) =>
+      _PopulatedConnectionBuilder(
+          key: key, collection: collection, builder: builder);
+
+  final Connection<E> connection;
+  final FetchableBuilder<AsyncSnapshot<Id<E>>> builder;
+
+  @override
+  _ConnectionBuilderState<E> createState() => _ConnectionBuilderState<E>();
+}
+
+class _ConnectionBuilderState<E extends Entity<E>>
+    extends State<ConnectionBuilder<E>> {
+  StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> stream;
+
+  @override
+  void initState() {
+    super.initState();
+    stream = widget.connection.resolve();
+  }
+
+  @override
+  void dispose() {
+    stream.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Id<E>>(
+      stream: stream,
+      builder: (context, snapshot) => widget.builder(
+        context,
+        snapshot,
+        stream.fetch,
+      ),
+    );
+  }
+}
+
+class _PopulatedConnectionBuilder<E extends Entity<E>> extends StatefulWidget {
+  const _PopulatedConnectionBuilder({
+    Key key,
+    @required this.collection,
+    @required this.builder,
+  })  : assert(collection != null),
+        assert(builder != null),
+        super(key: key);
+
+  final Connection<E> collection;
+  final FetchableBuilder<AsyncSnapshot<E>> builder;
+
+  @override
+  _PopulatedConnectionBuilderState<E> createState() =>
+      _PopulatedConnectionBuilderState<E>();
+}
+
+class _PopulatedConnectionBuilderState<E extends Entity<E>>
+    extends State<_PopulatedConnectionBuilder<E>> {
+  StreamAndData<E, CachedFetchStreamData<dynamic>> stream;
+
+  @override
+  void initState() {
+    super.initState();
+    stream = widget.collection.resolve().resolve();
+  }
+
+  @override
+  void dispose() {
+    stream.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<E>(
       stream: stream,
       builder: (context, snapshot) => widget.builder(
         context,
