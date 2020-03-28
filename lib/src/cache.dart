@@ -41,12 +41,21 @@ class HiveCacheImpl {
 
   Future<void> initialize([String boxName]) async {
     assert(_box == null, 'initialize was already called');
+    boxName ??= 'cache';
+
     await Hive.initFlutter();
     Hive
       ..registerAdapter(_AdapterForId())
       ..registerAdapter(_AdapterForIdCollectionData())
       ..registerAdapter(_AdapterForIdConnectionData());
-    _box = await Hive.openBox(boxName ?? 'cache');
+
+    try {
+      _box = await Hive.openBox(boxName);
+    } on HiveError catch (e) {
+      print('Error while initializing HiveCache: $e');
+      await Hive.deleteBoxFromDisk(boxName);
+      _box = await Hive.openBox(boxName);
+    }
   }
 
   void registerEntityType<E extends Entity<E>>(
