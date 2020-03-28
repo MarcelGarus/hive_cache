@@ -49,14 +49,11 @@ class HiveCacheImpl {
       ..registerAdapter(_AdapterForIdCollectionData())
       ..registerAdapter(_AdapterForIdConnectionData());
 
-    try {
-      _box = await Hive.openBox(boxName);
-    } on HiveError catch (e) {
-      print('Error while initializing HiveCache: $e');
-      await Hive.deleteBoxFromDisk(boxName);
-      _box = await Hive.openBox(boxName);
-    }
+    _box = await Hive.openBox(boxName);
   }
+
+  Future<void> delete([String boxName]) =>
+      Hive.deleteBoxFromDisk(boxName ?? 'cache');
 
   void registerEntityType<E extends Entity<E>>(
       TypeAdapter<E> adapter, FetchById<E> fetch) {
