@@ -22,8 +22,14 @@ final HiveCache = HiveCacheImpl();
 
 class HiveCacheImpl {
   /// Map from type ids of entites to [_Fetcher]s, which know how to fetch an
-  /// entity of that type by its id.
+  /// entity of that type by its [Id].
   final _fetchers = <int, _Fetcher>{};
+
+  /// Whether [TypeAdapter]s for HiveCache-types like [Id], [Collection] and
+  /// [Connection] have been registered at [Hive].
+  var _adaptersRegistered = false;
+
+  /// The [Box] that contains all the cached data.
   Box<dynamic> _box;
 
   Future<E> _fetch<E extends Entity<E>>(Id<E> id) {
@@ -44,10 +50,13 @@ class HiveCacheImpl {
     boxName ??= 'cache';
 
     await Hive.initFlutter();
-    Hive
-      ..registerAdapter(_AdapterForId())
-      ..registerAdapter(_AdapterForIdCollectionData())
-      ..registerAdapter(_AdapterForIdConnectionData());
+    if (!_adaptersRegistered) {
+      Hive
+        ..registerAdapter(_AdapterForId())
+        ..registerAdapter(_AdapterForIdCollectionData())
+        ..registerAdapter(_AdapterForIdConnectionData());
+      _adaptersRegistered = true;
+    }
 
     _box = await Hive.openBox(boxName);
   }
