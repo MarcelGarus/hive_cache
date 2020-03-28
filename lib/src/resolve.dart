@@ -5,7 +5,7 @@ extension ResolvedId<E extends Entity<E>> on Id<E> {
     return FetchStream.create<E>(() => HiveCache.fetch(this)).cached(
       save: HiveCache.put,
       load: () => HiveCache.getStreamed(this),
-    );
+    )..fetch();
   }
 }
 
@@ -21,14 +21,14 @@ extension ResolvedIdCollection<E extends Entity<E>> on Collection<E> {
       save: (ids) =>
           _CollectionData<E>(id: _id, childrenIds: ids).saveToCache(),
       load: () => HiveCache.get(_id),
-    );
+    )..fetch();
   }
 }
 
 extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
   Stream<List<E>> resolveAll() {
     return CombineLatestStream.list([
-      for (final id in this) HiveCache.getStreamed<E>(id),
+      for (final id in this) id.resolve()..fetch(),
     ]);
   }
 }
@@ -51,7 +51,7 @@ extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
     }).cached(
       save: (id) => _ConnectionData<E>(id: _id, connectedId: id).saveToCache(),
       load: () => HiveCache.get(_id),
-    );
+    )..fetch();
   }
 }
 
