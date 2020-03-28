@@ -87,6 +87,34 @@ class EntityBuilder<E extends Entity<E>> extends StatelessWidget {
   }
 }
 
+class EntityListBuilder<E extends Entity<E>> extends StatelessWidget {
+  const EntityListBuilder({
+    Key key,
+    @required this.ids,
+    @required this.builder,
+  }) : super(key: key);
+
+  final List<Id<E>> ids;
+  final FetchableBuilder<AsyncSnapshot<List<E>>> builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return _ScopedBuilder<
+        StreamAndData<List<E>, CachedFetchStreamData<dynamic>>>(
+      create: () => ids.resolveAll(),
+      destroy: (stream) => stream.dispose(),
+      builder: (_, stream) => StreamBuilder<List<E>>(
+        stream: stream,
+        builder: (context, snapshot) => builder(
+          context,
+          snapshot,
+          stream.fetch,
+        ),
+      ),
+    );
+  }
+}
+
 class CollectionBuilder<E extends Entity<E>> extends StatelessWidget {
   const CollectionBuilder({
     Key key,
