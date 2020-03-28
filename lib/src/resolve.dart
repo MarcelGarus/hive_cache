@@ -1,7 +1,7 @@
 part of 'cache.dart';
 
 extension ResolvedId<E extends Entity<E>> on Id<E> {
-  StreamAndData<E, CachedFetchStreamData<E>> resolve() {
+  StreamAndData<E, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<E>(() => HiveCache.fetch(this)).cached(
       save: HiveCache.put,
       load: () => HiveCache.getStreamed(this),
