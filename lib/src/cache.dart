@@ -89,13 +89,15 @@ class HiveCacheImpl {
           int typeId, String id, String connectedId) =>
       _getFetcherOfTypeId(typeId)._createConnection(id, connectedId);
 
-  void put<E extends Entity<E>>(E entity) {
+  void _put<E extends Entity<E>>(E entity) {
     _box.put(entity.id.value, entity);
   }
 
-  E get<E extends Entity<E>>(Id<E> id) => _box.get(id.value) as E;
-  Stream<E> getStreamed<E extends Entity<E>>(Id<E> id) {
-    return _box.watch(key: id.value).map((event) => event.value).cast<E>();
+  Stream<E> _get<E extends Entity<E>>(Id<E> id) async* {
+    yield _box.get(id.value);
+    await for (final event in _box.watch(key: id.value)) {
+      yield event.value as E;
+    }
   }
 }
 
