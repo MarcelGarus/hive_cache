@@ -38,8 +38,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: b8695f8
-      resolved-ref: b8695f81e4a61be1bd6d67c07bec999575f8beae
+      ref: "4b85006"
+      resolved-ref: "4b85006351b04faa76d7530b8fbb9fe8c2107fbb"
       url: "git://github.com/marcelgarus/flutter_cached"
     source: git
     version: "5.0.0"
