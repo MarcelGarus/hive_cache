@@ -94,7 +94,11 @@ class HiveCacheImpl {
   }
 
   Stream<E> _get<E extends Entity<E>>(Id<E> id) async* {
-    yield _box.get(id.value);
+    final initialValue = _box.get(id.value);
+    if (initialValue != null) {
+      yield initialValue;
+    }
+
     await for (final event in _box.watch(key: id.value)) {
       yield event.value as E;
     }
