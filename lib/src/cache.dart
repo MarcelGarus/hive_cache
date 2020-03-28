@@ -26,7 +26,7 @@ class HiveCacheImpl {
   final _fetchers = <int, _Fetcher>{};
   Box<dynamic> _box;
 
-  Future<E> fetch<E extends Entity<E>>(Id<E> id) {
+  Future<E> _fetch<E extends Entity<E>>(Id<E> id) {
     final fetcher = _fetchers.values
         .whereType<_Fetcher<E>>()
         .singleWhere((_) => true, orElse: () => null);
