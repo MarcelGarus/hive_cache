@@ -27,17 +27,29 @@ extension ResolvedIdCollection<E extends Entity<E>> on Collection<E> {
 }
 
 extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
-  Stream<List<E>> resolveAll() {
-    return CombineLatestStream.list([
-      for (final id in this) id.resolve()..fetch(),
-    ]);
+  StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolveAll() {
+    return FetchStream.create(() async {
+      return Future.wait([
+        for (final id in this) id.resolve().first,
+      ]);
+    }).cached(
+      save: (entities) => entities.saveAllToCache(),
+      load: () => CombineLatestStream.list([
+        for (final id in this) id.loadFromCache(),
+      ]),
+    );
   }
 }
 
 extension ResolvedIdListStream<E extends Entity<E>>
     on StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> {
   StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolveAll() {
-    return switchMap((ids) => ids.resolveAll());
+    return FetchStream.create(() async {
+      return await (await first).resolveAll().first;
+    }).cached(
+      save: (entities) => entities.saveAllToCache(),
+      load: () => switchMap((ids) => ids.resolveAll()),
+    );
   }
 }
 
@@ -59,6 +71,11 @@ extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
 extension ResolvedIdStream<E extends Entity<E>>
     on StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> {
   StreamAndData<E, CachedFetchStreamData<dynamic>> resolve() {
-    return switchMap((id) => id.resolve());
+    return FetchStream.create(() async {
+      return await (await first).resolve().first;
+    }).cached(
+      save: (entity) => entity.saveToCache(),
+      load: () => switchMap((id) => id.resolve()),
+    );
   }
 }
