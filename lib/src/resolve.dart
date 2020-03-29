@@ -37,7 +37,7 @@ extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
       load: () => CombineLatestStream.list([
         for (final id in this) id.loadFromCache(),
       ]),
-    );
+    )..fetch();
   }
 }
 
@@ -49,7 +49,7 @@ extension ResolvedIdListStream<E extends Entity<E>>
     }).cached(
       save: (entities) => entities.saveAllToCache(),
       load: () => switchMap((ids) => ids.resolveAll()),
-    );
+    )..fetch();
   }
 }
 
@@ -58,8 +58,10 @@ extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
 
   StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<Id<E>>(() async {
-      final entity = await fetcher()
-        ..saveToCache();
+      final entity = await fetcher();
+      assert(entity != null);
+      
+      entity.saveToCache();
       return entity.id;
     }).cached(
       save: (id) => _ConnectionData<E>(id: _id, connectedId: id).saveToCache(),
@@ -76,6 +78,6 @@ extension ResolvedIdStream<E extends Entity<E>>
     }).cached(
       save: (entity) => entity.saveToCache(),
       load: () => switchMap((id) => id.resolve()),
-    );
+    )..fetch();
   }
 }
