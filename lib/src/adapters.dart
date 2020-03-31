@@ -47,13 +47,15 @@ class _AdapterForIdConnectionData
   void write(BinaryWriter writer, _ConnectionData<dynamic> connection) => writer
     ..writeInt(connection.typeId)
     ..writeString(connection.id.value)
-    ..writeString(connection.connectedId.value);
+    ..writeString(connection.connectedId?.value ?? '');
 
   @override
-  _ConnectionData<dynamic> read(BinaryReader reader) =>
-      HiveCache._createConnectionOfTypeId(
-        reader.readInt(),
-        reader.readString(),
-        reader.readString(),
-      );
+  _ConnectionData<dynamic> read(BinaryReader reader) {
+    final connectedId = reader.readString();
+    return HiveCache._createConnectionOfTypeId(
+      reader.readInt(),
+      reader.readString(),
+      connectedId.isEmpty ? null : connectedId,
+    );
+  }
 }

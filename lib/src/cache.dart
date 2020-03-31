@@ -139,7 +139,7 @@ class _Fetcher<E extends Entity<E>> {
   _ConnectionData<E> _createConnection(String id, String connectedId) {
     return _ConnectionData(
       id: Id<_ConnectionData<E>>(id),
-      connectedId: Id<E>(connectedId),
+      connectedId: Id<E>.orNull(connectedId),
     );
   }
 }
