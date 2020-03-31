@@ -22,4 +22,12 @@ class _ConnectionData<E extends Entity<E>>
   final Id<E> connectedId;
 
   int get typeId => HiveCache.typeIdByType<E>();
+
+  @override
+  bool operator ==(Object other) =>
+      other is _ConnectionData<E> &&
+      id == other.id &&
+      connectedId == other.connectedId;
+  @override
+  int get hashCode => hashList([id, connectedId]);
 }

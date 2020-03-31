@@ -23,4 +23,12 @@ class _CollectionData<E extends Entity<E>>
   final List<Id<E>> childrenIds;
 
   int get typeId => HiveCache.typeIdByType<E>();
+
+  @override
+  bool operator ==(Object other) =>
+      other is _CollectionData<E> &&
+      id == other.id &&
+      DeepCollectionEquality().equals(childrenIds, other.childrenIds);
+  @override
+  int get hashCode => hashList([id, childrenIds]);
 }
