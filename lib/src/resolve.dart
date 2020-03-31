@@ -53,16 +53,15 @@ extension ResolvedIdListStream<E extends Entity<E>>
   }
 }
 
-extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
+extension ResolvedConnection<E extends Entity<E>> on Connection<E> {
   Id<_ConnectionData<E>> get _id => Id<_ConnectionData<E>>(id);
 
   StreamAndData<Id<E>, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<Id<E>>(() async {
       final entity = await fetcher();
-      assert(entity != null);
 
-      entity.saveToCache();
-      return entity.id;
+      entity?.saveToCache();
+      return entity?.id;
     }).cached(
       save: (id) => _ConnectionData<E>(id: _id, connectedId: id).saveToCache(),
       load: () => _id.loadFromCache().map((data) => data.connectedId),
