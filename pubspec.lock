@@ -38,8 +38,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: f78c099
-      resolved-ref: f78c099961d6f7b8dcf325c50ab26b0a5e666ccf
+      ref: d5c81d8
+      resolved-ref: d5c81d82c483399ef14dc700a0b127272e2716a1
       url: "git://github.com/marcelgarus/flutter_cached"
     source: git
     version: "5.0.0"
@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.3.0+2"
+  maybe:
+    dependency: transitive
+    description:
+      name: maybe
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.0"
   meta:
     dependency: transitive
     description:

@@ -60,7 +60,7 @@ extension ResolvedIdConnection<E extends Entity<E>> on Connection<E> {
     return FetchStream.create<Id<E>>(() async {
       final entity = await fetcher();
       assert(entity != null);
-      
+
       entity.saveToCache();
       return entity.id;
     }).cached(
