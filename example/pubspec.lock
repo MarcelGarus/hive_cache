@@ -37,9 +37,11 @@ packages:
   flutter_cached:
     dependency: transitive
     description:
-      path: "..\\..\\flutter_cached"
-      relative: true
-    source: path
+      path: "."
+      ref: f78c099
+      resolved-ref: f78c099961d6f7b8dcf325c50ab26b0a5e666ccf
+      url: "git://github.com/marcelgarus/flutter_cached"
+    source: git
     version: "5.0.0"
   hive:
     dependency: "direct main"
