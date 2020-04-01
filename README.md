@@ -1,6 +1,7 @@
-While Hive allows you to save arbitrary objects into memory, you still need to worry about fetching data.
+While [<kbd>hive</kbd>](https://pub.dev/packages/hive) allows you to save arbitrary objects into memory, you still need to worry about fetching data.
 Usually, when fetching data from a server, every item has a unique id.
-Data items which have an `Id` called  `Entity`s in this package:
+Data items which have an `Id` are called  `Entity`s in this package.
+Both `Id`s and `Entity`s are strongly typed:
 
 ```dart
 @HiveType(typeId: 0)
@@ -24,8 +25,8 @@ For `Entity`'s, you should call `registerEntityType` instead of `registerAdapter
 await HiveCache.initialize();
 HiveCache
   ..registerAdapter(SomeAdapter())
-  ..registerEntityType(FruitAdapter())
-  ..registerEntityType(SomeOtherEntityAdapter());
+  ..registerEntityType(FruitAdapter(), (someId) => parse(await http.get('.../fruits/$someId')))
+  ..registerEntityType(SomeOtherEntityAdapter(), (id) => ...);
 ```
 
 Then, if you have an `Id<Fruit>`, you can simply use an `EntityBuilder` to build the `Fruit`:
@@ -35,7 +36,7 @@ final id = Id<Fruit>('some-fruit');
 
 ...
 
-EntityBuilder(
+EntityBuilder<Fruit>(
   id: Id<Fruit>('some-fruit'),
   builder: (context, snapshot, fetch) {
     if (snapshot == null) {
@@ -48,6 +49,8 @@ EntityBuilder(
     } else if (snapshot.hasError) {
       return Text('${snapshot.error}, ${snapshot.stackTrace}');
     }
+    // Using [fetch], you can re-fetch data. By default, it only fetches from
+    // the cache. Use `fetch(force: true);` to fetch from the original source.
   },
 ),
 ```
@@ -75,14 +78,20 @@ class Person implements Entity<Person> {
 
   // Lazy reference to an entity.
   @HiveField(fieldId: 2)
-  final Connection<Person> mom;
+  final mom = Connection<Person>(
+    id: 'mom of $id',
+    fetcher: () async => parse(await http.get('.../people?momOf=$id')),
+  );
 
   // Lazy reference to multiple entities.
   @HiveField(fieldId: 3)
-  final Collection<Person> friends;
+  final friends = Collection<Person>(
+    id: 'friends of $id',
+    fetcher: () async => parse(await http.get('.../people?friendsWith=$id')),
+  );
 }
 ```
 
 You can use `ConnectionBuilder`s or `CollectionBuilder`s to build these `Entity`s similarly to how you would use an `EntityBuilder`.
-In the builder, you get the `Id` or `List<Id>` that the item references.
+In the builder, you get the `Id<T>` or `List<Id<T>>` that the item references.
 If you want to get the actual `Entity` or `List<Entity>`, you can use the `ConnectionBuilder.populated` and `CollectionBuilder.populated` constructors.
