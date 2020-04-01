@@ -4,7 +4,7 @@ extension ResolvedId<E extends Entity<E>> on Id<E> {
   StreamAndData<E, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<E>(() => HiveCache._fetch(this)).cached(
       save: (entity) => entity?.saveToCache(),
-      load: this == null ? () => null : loadFromCache,
+      load: this == null ? () => Stream.value(null) : loadFromCache,
     )..fetch();
   }
 }
@@ -51,7 +51,7 @@ extension ResolvedIdListStream<E extends Entity<E>>
     assert(this != null);
 
     return FetchStream.create(() async {
-      return await (await first)?.resolveAll().first;
+      return await (await first)?.resolveAll()?.first;
     }).cached(
       save: (entities) => entities?.saveAllToCache(),
       load: () => switchMap(
