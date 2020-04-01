@@ -167,7 +167,7 @@ class _PopulatedConnectionBuilder<E extends Entity<E>> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScopedBuilder<StreamAndData<E, CachedFetchStreamData<dynamic>>>(
-      create: () => connection.resolve().resolve(),
+      create: () => connection.resolve()?.resolve(),
       destroy: (stream) => stream.dispose(),
       builder: (_, stream) => CachedBuilder<E>(
         stream: stream,

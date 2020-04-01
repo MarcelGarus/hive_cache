@@ -3,8 +3,8 @@ part of 'cache.dart';
 extension ResolvedId<E extends Entity<E>> on Id<E> {
   StreamAndData<E, CachedFetchStreamData<dynamic>> resolve() {
     return FetchStream.create<E>(() => HiveCache._fetch(this)).cached(
-      save: (entity) => entity.saveToCache(),
-      load: loadFromCache,
+      save: (entity) => entity?.saveToCache(),
+      load: this == null ? () => null : loadFromCache,
     )..fetch();
   }
 }
@@ -33,7 +33,7 @@ extension ResolvedIdList<E extends Entity<E>> on List<Id<E>> {
         for (final id in this) id.resolve().first,
       ]);
     }).cached(
-      save: (entities) => entities.saveAllToCache(),
+      save: (entities) => entities?.saveAllToCache(),
       load: () => CombineLatestStream.list([
         for (final id in this) id.loadFromCache(),
       ]),
@@ -45,10 +45,12 @@ extension ResolvedIdListStream<E extends Entity<E>>
     on StreamAndData<List<Id<E>>, CachedFetchStreamData<dynamic>> {
   StreamAndData<List<E>, CachedFetchStreamData<dynamic>> resolveAll() {
     return FetchStream.create(() async {
-      return await (await first).resolveAll().first;
+      return await (await first)?.resolveAll().first;
     }).cached(
-      save: (entities) => entities.saveAllToCache(),
-      load: () => switchMap((ids) => ids.resolveAll()),
+      save: (entities) => entities?.saveAllToCache(),
+      load: () => switchMap(
+        (ids) => ids == null ? Stream.value(null) : ids.resolveAll(),
+      ),
     )..fetch();
   }
 }
@@ -75,8 +77,9 @@ extension ResolvedIdStream<E extends Entity<E>>
     return FetchStream.create(() async {
       return await (await first).resolve().first;
     }).cached(
-      save: (entity) => entity.saveToCache(),
-      load: () => switchMap((id) => id.resolve()),
+      save: (entity) => entity?.saveToCache(),
+      load: () =>
+          switchMap((id) => id == null ? Stream.value(null) : id.resolve()),
     )..fetch();
   }
 }
