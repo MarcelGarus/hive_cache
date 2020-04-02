@@ -51,6 +51,7 @@ extension ResolvedIdListStream<E extends Entity<E>>
     assert(this != null);
 
     return FetchStream.create(() async {
+      fetch();
       return await (await first)?.resolveAll()?.first;
     }).cached(
       save: (entities) => entities?.saveAllToCache(),
@@ -85,6 +86,7 @@ extension ResolvedIdStream<E extends Entity<E>>
     assert(this != null);
 
     return FetchStream.create(() async {
+      fetch();
       return await (await first).resolve().first;
     }).cached(
       save: (entity) => entity?.saveToCache(),
