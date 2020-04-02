@@ -13,7 +13,7 @@ dependencies:
   flutter_cached:
     git:
       url: git://github.com/marcelgarus/flutter_cached
-      ref: b095931
+      ref: 72220b1
 
   collection: ^1.14.0
   hive: ^1.2.0
