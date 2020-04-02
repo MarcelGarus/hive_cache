@@ -32,6 +32,7 @@ class HiveCacheImpl {
 
   /// The [Box] that contains all the cached data.
   Box<dynamic> _box;
+  bool get isInitialized => _box != null;
 
   Future<E> _fetch<E extends Entity<E>>(Id<E> id) {
     final fetcher = _fetchers.values
@@ -47,7 +48,7 @@ class HiveCacheImpl {
   }
 
   Future<void> initialize([String boxName]) async {
-    assert(_box == null, 'initialize was already called');
+    assert(!isInitialized, 'initialize was already called');
     boxName ??= 'cache';
 
     await Hive.initFlutter();
