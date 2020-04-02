@@ -63,8 +63,12 @@ class HiveCacheImpl {
     _box = await Hive.openBox(boxName);
   }
 
-  Future<void> delete([String boxName]) =>
-      Hive.deleteBoxFromDisk(boxName ?? 'cache');
+  Future<void> clear([String boxName]) async {
+    _box?.close();
+    _box = null;
+    await Hive.deleteBoxFromDisk(boxName ?? 'cache');
+    await initialize(boxName);
+  }
 
   void registerEntityType<E extends Entity<E>>(
       TypeAdapter<E> adapter, FetchById<E> fetch) {
