@@ -38,8 +38,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: eb4153f
-      resolved-ref: eb4153fe48297545f3e37b7175bd4f350347910e
+      ref: f9edb99
+      resolved-ref: f9edb997f3b976edc495928f1a56e009659f467a
       url: "git://github.com/marcelgarus/flutter_cached"
     source: git
     version: "5.0.0"
