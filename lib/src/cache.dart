@@ -64,7 +64,7 @@ class HiveCacheImpl {
   }
 
   Future<void> clear([String boxName]) async {
-    _box?.close();
+    await _box?.close();
     _box = null;
     await Hive.deleteBoxFromDisk(boxName ?? 'cache');
     await initialize(boxName);
