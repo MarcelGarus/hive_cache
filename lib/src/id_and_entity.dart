@@ -30,6 +30,7 @@ class Id<E extends Entity<E>> {
 
   @override
   String toString() => value;
+  String toJson() => value;
 }
 
 extension StringToId on String {
