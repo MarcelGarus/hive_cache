@@ -37,11 +37,9 @@ packages:
   flutter_cached:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "72220b1"
-      resolved-ref: "72220b1bd4af9be245e79eb1da994134811564a7"
-      url: "git://github.com/marcelgarus/flutter_cached"
-    source: git
+      name: flutter_cached
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "5.0.0"
   hive:
     dependency: "direct main"
