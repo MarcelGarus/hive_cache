@@ -1,4 +1,4 @@
-While [<kbd>hive</kbd>](https://pub.dev/packages/hive) allows you to save arbitrary objects into memory, you still need to worry about fetching data.
+While [<kbd>hive</kbd>](https://pub.dev/packages/hive) allows you to save arbitrary objects to memory, you still need to worry about fetching data if necessary.
 Usually, when fetching data from a server, every item has a unique id.
 Data items which have an `Id` are called  `Entity`s in this package.
 Both `Id`s and `Entity`s are strongly typed:
@@ -25,7 +25,7 @@ For `Entity`'s, you should call `registerEntityType` instead of `registerAdapter
 await HiveCache.initialize();
 HiveCache
   ..registerAdapter(SomeAdapter())
-  ..registerEntityType(FruitAdapter(), (someId) => parse(await http.get('.../fruits/$someId')))
+  ..registerEntityType(FruitAdapter(), (someId) => parse(await http.get('https://.../fruits/$someId')))
   ..registerEntityType(SomeOtherEntityAdapter(), (id) => ...);
 ```
 
@@ -58,7 +58,7 @@ EntityBuilder<Fruit>(
 ## Live updating
 
 You can call `saveToCache()` on any `Entity` to save it to the cache.
-All builders that reference this `Entity` get automatically updated.
+All `EntityBuilder`s that reference this `Entity` get automatically updated.
 
 You can call `loadFromCache()` on any `Id<T>` to retrieve a `Stream<T>` of the entity.
 Whenever a new item gets saved to the cache, the `Stream` contains a new event with this item.
