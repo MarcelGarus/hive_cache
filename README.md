@@ -1,77 +1,97 @@
-While Hive allows you to save arbitrary objects into memory, you still need to worry about multiple boxes and entities referencing each other.
-This package is a thin wrapper above Hive that makes it easier to store your entities.
-
-Entities usually relate to one another.
-Your entities should implement `Entity` – that means they have to implement an `id` getter, which returns an `Id`, which is just a wrapper of a `String` that uniquely identifies this entity among other entities of the same type.
-
-`Id`s can also be used to reference other entities.
-For example, a `Person` might reference another `Person` or even another entity type, like a `Pet`.
+While [<kbd>hive</kbd>](https://pub.dev/packages/hive) allows you to save arbitrary objects to memory, you still need to worry about fetching data if necessary.
+Usually, when fetching data from a server, every item has a unique id.
+Data items which have an `Id` are called  `Entity`s in this package.
+Both `Id`s and `Entity`s are strongly typed:
 
 ```dart
-
 @HiveType(typeId: 0)
-class Person extends Entity<Person> {
-  const Person({
-    @required this.id,
-    @required this.firstName,
-    @required this.lastName,
-    @required this.friends,
-  });
+class Fruit implements Entity<Fruit> {
+  @HiveField(fieldId: 0)
+  final Id<Fruit> id;
+  
+  @HiveField(fieldId: 1)
+  final String name;
 
-  @HiveField(0)
-  final Id<Person> id;
-
-  @HiveField(1)
-  final String firstName;
-
-  @HiveField(2)
-  final String lastName;
-
-  @HiveField(3)
-  final List<Id<Person>> friends;
-
-  String toString() => '$firstName $lastName';
+  @HiveField(fieldId: 2)
+  final int amount;
 }
 ```
 
-Then, you can create a `HiveCache`. It will manage saving entities among multiple boxes.
+Before doing anything, you should initialize the `HiveCache`.
+Instead of registering your `TypeAdapter`s at `Hive` yourself, you can just register them at `HiveCache`, which does that for you.
+For `Entity`'s, you should call `registerEntityType` instead of `registerAdapter` and provide a method that get executed whenever an `Entity` should be fetched:
 
 ```dart
-void main() {
-  Hive.init('.');
-  Hive.registerAdapter(PersonAdapter(), 51);
-  HiveCache.initialize({
-    CacheBox<Person>(
-      typeId: 0, // doesn't have to be the same typeId as for Hive
-      box: await Hive.openBox<Person>('people'),
-    ),
-  });
+await HiveCache.initialize();
+HiveCache
+  ..registerAdapter(SomeAdapter())
+  ..registerEntityType(FruitAdapter(), (someId) => parse(await http.get('https://.../fruits/$someId')))
+  ..registerEntityType(SomeOtherEntityAdapter(), (id) => ...);
+```
 
-  final foo = Person(
-    id: Id('abc'),
-    firstName: 'Foo',
-    lastName: 'Blub',
-    friends: [Id('abc'), Id('xyz')],
+Then, if you have an `Id<Fruit>`, you can simply use an `EntityBuilder` to build the `Fruit`:
+
+```dart
+final id = Id<Fruit>('some-fruit');
+
+...
+
+EntityBuilder<Fruit>(
+  id: Id<Fruit>('some-fruit'),
+  builder: (context, snapshot, fetch) {
+    if (snapshot == null) {
+      // Still loading.
+      return Center(child: CircularProgressIndicator());
+    } else if (snapshot.hasData) {
+      // The snapshot contains data. It may be [null] if the fetch function
+      // returned [null].
+      return Text(snapshot.data);
+    } else if (snapshot.hasError) {
+      return Text('${snapshot.error}, ${snapshot.stackTrace}');
+    }
+    // Using [fetch], you can re-fetch data. By default, it only fetches from
+    // the cache. Use `fetch(force: true);` to fetch from the original source.
+  },
+),
+```
+
+## Live updating
+
+You can call `saveToCache()` on any `Entity` to save it to the cache.
+All `EntityBuilder`s that reference this `Entity` get automatically updated.
+
+You can call `loadFromCache()` on any `Id<T>` to retrieve a `Stream<T>` of the entity.
+Whenever a new item gets saved to the cache, the `Stream` contains a new event with this item.
+
+## Lazy references
+
+You can not only reference other `Entity`s by their `Id` or multiple `Entity`s by a `List<Id>`, but you can also have lazy fetching of other entities:
+
+```dart
+@HiveType(typeId: 1)
+class Person implements Entity<Person> {
+  @HiveField(fieldId: 0)
+  final Id<Person> id;
+  
+  @HiveField(fieldId: 1)
+  final String name;
+
+  // Lazy reference to an entity.
+  @HiveField(fieldId: 2)
+  final mom = Connection<Person>(
+    id: 'mom of $id',
+    fetcher: () async => parse(await http.get('.../people?momOf=$id')),
   );
-  final bar = Person(
-    id: Id('xyz'),
-    firstName: 'Bar',
-    lastName: 'Plubble',
-    friends: [Id('abc')],
+
+  // Lazy reference to multiple entities.
+  @HiveField(fieldId: 3)
+  final friends = Collection<Person>(
+    id: 'friends of $id',
+    fetcher: () async => parse(await http.get('.../people?friendsWith=$id')),
   );
-
-  HiveCache.put(foo);
-  HiveCache.put(bar);
-
-  final someone = HiveCache.get(Id<Person>('abc'));
-  print(someone);
-  for (final friendId in someone.friends) {
-    print(friendId.value);
-  }
 }
 ```
 
-If you create a new class, just make it extend entity, register a `CacheBox` at the `HiveCache` and you're ready to `put` and `get` entities from the `HiveCache`.
-
-For now, the `HiveCache` is persistent.
-In the future, it may also support removing unused data (some kind of garbage collection by references or time not used).
+You can use `ConnectionBuilder`s or `CollectionBuilder`s to build these `Entity`s similarly to how you would use an `EntityBuilder`.
+In the builder, you get the `Id<T>` or `List<Id<T>>` that the item references.
+If you want to get the actual `Entity` or `List<Entity>`, you can use the `ConnectionBuilder.populated` and `CollectionBuilder.populated` constructors.

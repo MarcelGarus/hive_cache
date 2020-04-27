@@ -1,3 +1,7 @@
+## [2.0.0] - 2020-04-27
+
+* Complete rewrite of the API.
+
 ## [1.0.0] - 2020-01-30
 
 * Complete overhaul of the concept and the API.
