@@ -77,33 +77,3 @@ jobs:
           danger_id: "danger-pr"
         env:
           DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-example:
-    name: Build example
-    needs: install
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-      - name: Install Flutter
-        uses: subosito/flutter-action@v1
-        with:
-          channel: ${{ env.FLUTTER_CHANNEL }}
-
-      - name: Checkout source
-        uses: actions/download-artifact@v2
-        with:
-          name: source
-
-      - name: Build APK
-        run: |
-          cd ./example
-          flutter build apk
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: example-apk
-          path: build/app/outputs/apk/release/app-release.apk
