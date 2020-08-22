@@ -1,3 +1,7 @@
+## [2.0.1] - 2020-08-22
+
+* Update <kbd>rxdart</kbd> dependency.
+
 ## [2.0.0] - 2020-04-27
 
 * Complete rewrite of the API.
