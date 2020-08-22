@@ -1,3 +1,7 @@
+## [2.0.2] - 2020-08-22
+
+* Actually update <kbd>rxdart</kbd> dependency.
+
 ## [2.0.1] - 2020-08-22
 
 * Update <kbd>rxdart</kbd> dependency.

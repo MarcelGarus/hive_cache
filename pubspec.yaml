@@ -1,6 +1,6 @@
 name: hive_cache
 description: A persistent cache that uses hive.
-version: 2.0.1
+version: 2.0.2
 homepage: https://github.com/marcelgarus/hive_cache
 
 environment:
@@ -15,4 +15,4 @@ dependencies:
   hive: ^1.2.0
   hive_flutter: ^0.3.0+2
   meta: ^1.1.8
-  rxdart: ">=0.23.1 <0.24.0"
+  rxdart: ">=0.23.1 <0.25.0"
